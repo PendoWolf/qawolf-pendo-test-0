@@ -4,11 +4,9 @@
 export {};
 
 declare global {
-  interface PendoAgent {
-    track?: (name: string, props?: Record<string, unknown>) => void;
-    initialize?: (config: Record<string, unknown>) => void;
-  }
+  // eslint-disable-next-line no-var
+  var pendo: any;
   interface Window {
-    pendo?: PendoAgent;
+    pendo?: any;
   }
 }
