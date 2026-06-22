@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QAWolf Demo</title>
 
-    <!-- PENDO SNIPPET (deferred) -->
-    <!--
-      When ready, paste the Pendo agent install snippet here and call
-      pendo.initialize({ visitor: { id }, account: { id } }).
-      Button handlers in App.tsx already have a trackEvent() seam to wire up
-      pendo.track(...) calls for QAWolf assertions.
-    -->
+    <script>
+(function(apiKey){
+    (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=o._q||[];
+    v=['initialize','identify','updateOptions','pageLoad','track', 'trackAgent'];for(w=0,x=v.length;w<x;++w)(function(m){
+    o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
+    y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo-dev.pendo-dev.com/agent/static/'+apiKey+'/pendo.js';
+    z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
+})('52af522d-11d4-4bf0-b5d1-d2cf0883b486');
+</script>
   </head>
   <body>
     <div id="root"></div>
