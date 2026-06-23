@@ -13,14 +13,18 @@ function trackEvent(name: string) {
 export default function App() {
   const [state, setState] = useState<AppState>({ counter: 0, lastAction: "none" });
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const run = async (name: string, fn: () => Promise<AppState>) => {
     try {
       setError(null);
+      setLoading(true);
       setState(await fn());
       trackEvent(name);
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,33 +34,87 @@ export default function App() {
   }, []);
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", maxWidth: 480, margin: "4rem auto", textAlign: "center" }}>
+    <main
+      style={{ fontFamily: "system-ui, sans-serif", maxWidth: 480, margin: "4rem auto", textAlign: "center" }}
+      aria-label="QAWolf Demo application"
+    >
       <h1>QAWolf Demo</h1>
 
-      <p data-testid="counter-value" style={{ fontSize: "3rem", margin: "1rem 0" }}>
+      <p
+        data-testid="counter-value"
+        aria-label={`Counter value: ${state.counter}`}
+        aria-live="polite"
+        style={{ fontSize: "3rem", margin: "1rem 0" }}
+      >
         {state.counter}
       </p>
-      <p data-testid="last-action" style={{ color: "#666" }}>
+      <p
+        data-testid="last-action"
+        aria-live="polite"
+        style={{ color: "#666" }}
+      >
         Last action: {state.lastAction}
       </p>
 
-      <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-        <button data-testid="btn-increment" onClick={() => run("increment", api.increment)}>
+      {/* [CRITICAL] Loading indicator: users had no feedback during async operations */}
+      {loading && (
+        <p
+          role="status"
+          aria-label="Loading"
+          style={{ color: "#888", fontSize: "0.875rem", marginBottom: 8 }}
+        >
+          Loading…
+        </p>
+      )}
+
+      <div
+        role="group"
+        aria-label="Counter controls"
+        style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}
+      >
+        {/* [CRITICAL] Buttons disabled during requests to prevent duplicate submissions */}
+        <button
+          data-testid="btn-increment"
+          disabled={loading}
+          aria-disabled={loading}
+          onClick={() => run("increment", api.increment)}
+        >
           Increment
         </button>
-        <button data-testid="btn-decrement" onClick={() => run("decrement", api.decrement)}>
+        <button
+          data-testid="btn-decrement"
+          disabled={loading}
+          aria-disabled={loading}
+          onClick={() => run("decrement", api.decrement)}
+        >
           Decrement
         </button>
-        <button data-testid="btn-reset" onClick={() => run("reset", api.reset)}>
+        <button
+          data-testid="btn-reset"
+          disabled={loading}
+          aria-disabled={loading}
+          onClick={() => run("reset", api.reset)}
+        >
           Reset
         </button>
-        <button data-testid="btn-refresh" onClick={() => run("refresh", api.getState)}>
+        <button
+          data-testid="btn-refresh"
+          disabled={loading}
+          aria-disabled={loading}
+          onClick={() => run("refresh", api.getState)}
+        >
           Refresh
         </button>
       </div>
 
+      {/* [CRITICAL] Error now announced to screen readers via role="alert" */}
       {error && (
-        <p data-testid="error" style={{ color: "crimson", marginTop: 16 }}>
+        <p
+          data-testid="error"
+          role="alert"
+          aria-live="assertive"
+          style={{ color: "crimson", marginTop: 16 }}
+        >
           {error}
         </p>
       )}
