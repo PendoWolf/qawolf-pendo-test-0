@@ -17,28 +17,14 @@ export default function App() {
   const run = async (name: string, fn: () => Promise<AppState>) => {
     try {
       setError(null);
-      const previousValue = state.counter;
-      const newState = await fn();
-      setState(newState);
-
-      if (name === "increment" || name === "decrement" || name === "reset") {
-        trackEvent(name, {
-          counterValue: newState.counter,
-          previousValue,
-        });
-      } else {
-        trackEvent(name, {
-          counterValue: newState.counter,
-          lastAction: newState.lastAction,
-        });
-      }
-    } catch (e) {
-      const errorMessage = (e as Error).message;
-      setError(errorMessage);
-      trackEvent("action-failed", {
-        attemptedAction: name,
-        errorMessage: errorMessage.substring(0, 100),
+      const result = await fn();
+      setState(result);
+      trackEvent(name, {
+        counter: result.counter,
+        lastAction: result.lastAction,
       });
+    } catch (e) {
+      setError((e as Error).message);
     }
   };
 
