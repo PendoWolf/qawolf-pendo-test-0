@@ -22,7 +22,8 @@ export default function App() {
       setState(newState);
       trackEvent(name, {
         counterValue: newState.counter,
-        previousValue,
+        previousCounterValue: previousValue,
+        lastAction: newState.lastAction,
       });
     } catch (e) {
       setError((e as Error).message);
