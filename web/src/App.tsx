@@ -4,9 +4,9 @@ import { api, type AppState } from "./api";
 // Seam for Pendo. Novus installs the Pendo agent, which provides window.pendo
 // at runtime; this fires a Track Event for each action. No-op when the agent
 // isn't present (local dev), so the app and Playwright mocks both stay simple.
-function trackEvent(name: string) {
+function trackEvent(name: string, metadata?: Record<string, string | number>) {
   if (typeof window !== "undefined") {
-    window.pendo?.track?.(`demo-${name}`);
+    window.pendo?.track?.(`demo-${name}`, metadata);
   }
 }
 
@@ -15,12 +15,31 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   const run = async (name: string, fn: () => Promise<AppState>) => {
+    const previousCounter = state.counter;
     try {
       setError(null);
-      setState(await fn());
-      trackEvent(name);
+      const newState = await fn();
+      setState(newState);
+
+      const metadata: Record<string, string | number> = {
+        counter_value: newState.counter,
+      };
+      if (name === "increment" || name === "decrement") {
+        metadata.previous_value = previousCounter;
+        metadata.last_action = newState.lastAction;
+      } else if (name === "reset") {
+        metadata.previous_counter_value = previousCounter;
+      } else {
+        metadata.last_action = newState.lastAction;
+      }
+      trackEvent(name, metadata);
     } catch (e) {
-      setError((e as Error).message);
+      const msg = (e as Error).message;
+      setError(msg);
+      trackEvent("action-failed", {
+        action_name: name,
+        error_message: msg.substring(0, 200),
+      });
     }
   };
 
