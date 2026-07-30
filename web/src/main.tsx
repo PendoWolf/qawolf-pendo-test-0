@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 
 Let visitorId = localStorage.getItem(‘demo-visitor-id’);
-If (!visitorId) {
+if (!visitorId) {
 	visitorId = ‘visitor-‘ + Math.random().toString(36).slice(2);
 	localStorage.setItem(‘demo-visitor-id’, visitorId); 
 }
