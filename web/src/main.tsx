@@ -21,6 +21,7 @@ pendo.initialize({
   account: {
     id: accountId,
   },
+  sessionReplay: { isActive: true },
 });
 
 createRoot(document.getElementById("root")!).render(
